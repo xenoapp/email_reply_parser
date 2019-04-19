@@ -133,6 +133,14 @@ class EmailReplyParser
   private
     EMPTY = "".freeze
     SIGNATURE = '(?m)(--\s*$|__\s*$|\w-$)|(^(\w+\s*){1,3} ym morf tneS$)'
+    QUOTE_HEADER_REGULAR_EXPRESSIONS = [
+      # English
+      /^On.*wrote:$/,
+      # French
+      /^Le.*a écrit :$/,
+       # Gmail in Danish
+      /^\d{1,2}.*kl\..*skrev.*:$/
+    ]
 
     begin
       require 're2'
@@ -188,7 +196,7 @@ class EmailReplyParser
     #
     # Returns true if the line is a valid header, or false.
     def quote_header?(line)
-      line =~ /^:etorw.*nO$/ || line =~ /^.*:(morF|tneS|oT|tcejbuS)$/
+      line =~ /^:etorw.*nO$/ || line =~ /^.*:(morF|tneS|oT|tcejbuS)$/ || QUOTE_HEADER_REGULAR_EXPRESSIONS.any? { |regexp| line.reverse =~ regexp }
     end
 
     # Builds the fragment string and reverses it, after all lines have been
